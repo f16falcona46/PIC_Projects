@@ -19,6 +19,7 @@ GPR_VAR1    UDATA
     scratch2			RES 1
     counter			RES 1
     counter2			RES 1
+    counter3			RES 1
     num_to_output		RES 1
     char_index			RES 1
 GPR_VAR2    UDATA
@@ -354,14 +355,20 @@ CLEARSCREEN_LOOP_X
     DECF counter2, F
     BTFSS STATUS, Z
     GOTO CLEARSCREEN_LOOP_Y
-
+    
+    CLRF char_index
+    CLRF counter3
+Y_INCR_LOOP
     CLRF counter2
 LOOP
     CLRF counter
 PRINT_2_LOOP
     BCF PORTC, LCD_DC
     BCF PORTC, NSS
-    ShiftOut b'01000000'
+    MOVFW counter3
+    IORLW b'01000000'
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
     MOVFW counter2
     MOVWF subroutine_input
     MOVLW 0x06
@@ -374,7 +381,8 @@ PRINT_2_LOOP
     CALL SHIFTOUT_M
     
     BSF PORTC, LCD_DC
-    MOVFW counter2
+    MOVFW char_index
+    ANDLW 0x0f
     MOVWF subroutine_input
     MOVFW counter
     MOVWF subroutine_input2
@@ -388,13 +396,32 @@ PRINT_2_LOOP
     GOTO PRINT_2_LOOP
     BSF PORTC, NSS
     
+;    MOVFW counter
+;    MOVWF scratch1
+;    MOVFW counter2
+;    MOVWF scratch2
+;    
+;    MOVLW 0x3f
+;    CALL PAUSE
+;    
+;    MOVFW scratch1
+;    MOVWF counter
+;    MOVFW scratch2
+;    MOVWF counter2
+    
+    INCF char_index, F
     INCF counter2, F
-    MOVLW 0x10
+    MOVLW 0x0e
     SUBWF counter2, W
+    BTFSS STATUS, Z
+    GOTO LOOP
+    
+    INCF counter3, F
+    MOVLW 0x06
+    SUBWF counter3, W
     MOVLW 0x00
     BTFSC STATUS, Z
-    MOVWF counter2
-    
-    GOTO LOOP
+    MOVWF counter3
+    GOTO Y_INCR_LOOP
     
     END
