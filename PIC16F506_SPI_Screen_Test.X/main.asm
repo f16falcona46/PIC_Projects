@@ -63,6 +63,12 @@ CHARTABLE_NUMS
     GOTO CHARTABLE_NUMS7
     GOTO CHARTABLE_NUMS8
     GOTO CHARTABLE_NUMS9
+    GOTO CHARTABLE_NUMSa
+    GOTO CHARTABLE_NUMSb
+    GOTO CHARTABLE_NUMSc
+    GOTO CHARTABLE_NUMSd
+    GOTO CHARTABLE_NUMSe
+    GOTO CHARTABLE_NUMSf
     
 CHARTABLE_NUMS0
     MOVFW subroutine_input2
@@ -154,8 +160,70 @@ CHARTABLE_NUMS9
     RETLW 0x49
     RETLW 0x29
     RETLW 0x1e
-    
+CHARTABLE_NUMSa
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x20
+    RETLW 0x54
+    RETLW 0x54
+    RETLW 0x54
+    RETLW 0x78
+CHARTABLE_NUMSb
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x7f
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x38
+CHARTABLE_NUMSc
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x38
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x28
+CHARTABLE_NUMSd
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x38
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x44
+    RETLW 0x7f
+CHARTABLE_NUMSe
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x38
+    RETLW 0x54
+    RETLW 0x54
+    RETLW 0x54
+    RETLW 0x08
+CHARTABLE_NUMSf
+    MOVFW subroutine_input2
+    ADDWF PCL, F
+    RETLW 0x00
+    RETLW 0x08
+    RETLW 0x7e
+    RETLW 0x09
+    RETLW 0x09
+    RETLW 0x00
+
+;jump table
 PAUSE
+    GOTO PAUSE_IMPL
+SHIFTOUT_M
+    GOTO SHIFTOUT_M_IMPL
+MUL_SW
+    GOTO MUL_SW_IMPL
+    
+PAUSE_IMPL
     MOVWF counter
 PAUSE_LOOP
     CLRF counter2
@@ -191,7 +259,7 @@ SHIFTBIT_M MACRO reg_shiftout, reg_shiftin
     RLF reg_shiftin, F
     BCF PORTC, SCK
 ENDM
-SHIFTOUT_M
+SHIFTOUT_M_IMPL
     CLRF subroutine_output
     SHIFTBIT_M subroutine_input, subroutine_output
     SHIFTBIT_M subroutine_input, subroutine_output
@@ -203,7 +271,7 @@ SHIFTOUT_M
     SHIFTBIT_M subroutine_input, subroutine_output
     RETLW 0x00
     
-MUL_SW
+MUL_SW_IMPL
     MOVLW 0x00
     RRF subroutine_input2
     BTFSC STATUS, C
@@ -242,13 +310,6 @@ MUL_SW
 START
     MOVWF OSCCAL
     BANKSEL subroutine_input
-    
-    MOVLW 0x03
-    MOVWF subroutine_input
-    MOVLW 0x04
-    MOVWF subroutine_input2
-    CALL MUL_SW
-    MOVFW subroutine_output
     
     MOVLW 0xff
     TRIS PORTB
@@ -294,22 +355,20 @@ CLEARSCREEN_LOOP_X
     BTFSS STATUS, Z
     GOTO CLEARSCREEN_LOOP_Y
 
-    MOVLW 0x00
-    MOVWF counter2
+    CLRF counter2
 LOOP
-    MOVLW 0x00
-    MOVWF counter
+    CLRF counter
 PRINT_2_LOOP
     BCF PORTC, LCD_DC
     BCF PORTC, NSS
     ShiftOut b'01000000'
     MOVFW counter2
-    MOVWF scratch1
-    RLF scratch1, F
-    RLF scratch1, F
-    RLF scratch1, F
+    MOVWF subroutine_input
+    MOVLW 0x06
+    MOVWF subroutine_input2
+    CALL MUL_SW
     MOVLW b'10000000'
-    ADDWF scratch1, W
+    ADDWF subroutine_output, W
     ADDWF counter, W
     MOVWF subroutine_input
     CALL SHIFTOUT_M
@@ -330,7 +389,7 @@ PRINT_2_LOOP
     BSF PORTC, NSS
     
     INCF counter2, F
-    MOVLW 0x0a
+    MOVLW 0x10
     SUBWF counter2, W
     MOVLW 0x00
     BTFSC STATUS, Z

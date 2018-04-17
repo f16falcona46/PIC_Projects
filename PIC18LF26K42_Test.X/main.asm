@@ -1,59 +1,3 @@
-;*******************************************************************************
-;                                                                              *
-;    Microchip licenses this software to you solely for use with Microchip     *
-;    products. The software is owned by Microchip and/or its licensors, and is *
-;    protected under applicable copyright laws.  All rights reserved.          *
-;                                                                              *
-;    This software and any accompanying information is for suggestion only.    *
-;    It shall not be deemed to modify Microchip?s standard warranty for its    *
-;    products.  It is your responsibility to ensure that this software meets   *
-;    your requirements.                                                        *
-;                                                                              *
-;    SOFTWARE IS PROVIDED "AS IS".  MICROCHIP AND ITS LICENSORS EXPRESSLY      *
-;    DISCLAIM ANY WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING  *
-;    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS    *
-;    FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. IN NO EVENT SHALL          *
-;    MICROCHIP OR ITS LICENSORS BE LIABLE FOR ANY INCIDENTAL, SPECIAL,         *
-;    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, HARM TO     *
-;    YOUR EQUIPMENT, COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR    *
-;    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT LIMITED TO ANY   *
-;    DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR CONTRIBUTION, OR OTHER      *
-;    SIMILAR COSTS.                                                            *
-;                                                                              *
-;    To the fullest extend allowed by law, Microchip and its licensors         *
-;    liability shall not exceed the amount of fee, if any, that you have paid  *
-;    directly to Microchip to use this software.                               *
-;                                                                              *
-;    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF    *
-;    THESE TERMS.                                                              *
-;                                                                              *
-;*******************************************************************************
-;                                                                              *
-;    Filename:                                                                 *
-;    Date:                                                                     *
-;    File Version:                                                             *
-;    Author:                                                                   *
-;    Company:                                                                  *
-;    Description:                                                              *
-;                                                                              *
-;*******************************************************************************
-;                                                                              *
-;    Notes: In the MPLAB X Help, refer to the MPASM Assembler documentation    *
-;    for information on assembly instructions.                                 *
-;                                                                              *
-;*******************************************************************************
-;                                                                              *
-;    Known Issues: This template is designed for relocatable code.  As such,   *
-;    build errors such as "Directive only allowed when generating an object    *
-;    file" will result when the 'Build in Absolute Mode' checkbox is selected  *
-;    in the project properties.  Designing code in absolute mode is            *
-;    antiquated - use relocatable mode.                                        *
-;                                                                              *
-;*******************************************************************************
-;                                                                              *
-;    Revision History:                                                         *
-;                                                                              *
-;*******************************************************************************
 
 ; PIC18LF26K42 Configuration Bit Settings
 
@@ -63,7 +7,7 @@
 
 ; CONFIG1L
   CONFIG  FEXTOSC = ECH         ; External Oscillator Selection (EC (external clock) above 8 MHz; PFM set to high power)
-  CONFIG  RSTOSC = HFINTOSC_1MHZ; Reset Oscillator Selection (HFINTOSC with HFFRQ = 4 MHz and CDIV = 4:1)
+  CONFIG  RSTOSC = HFINTOSC_64MHZ; Reset Oscillator Selection (HFINTOSC with HFFRQ = 64 MHz and CDIV = 1:1)
 
 ; CONFIG1H
   CONFIG  CLKOUTEN = OFF        ; Clock out Enable bit (CLKOUT function is disabled)
@@ -89,7 +33,7 @@
 
 ; CONFIG3L
   CONFIG  WDTCPS = WDTCPS_31    ; WDT Period selection bits (Divider ratio 1:65536; software control of WDTPS)
-  CONFIG  WDTE = OFF            ; WDT operating mode (WDT Disabled; SWDTEN is ignored)
+  CONFIG  WDTE = ON             ; WDT operating mode (WDT enabled regardless of sleep)
 
 ; CONFIG3H
   CONFIG  WDTCWS = WDTCWS_7     ; WDT Window Select bits (window always open (100%); software control; keyed access not required)
