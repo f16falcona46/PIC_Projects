@@ -3,10 +3,10 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>PIC18LF26K42_Test</name>
-            <creation-uuid>f2c6fb3d-ec5b-46f7-862f-dad206c50311</creation-uuid>
+            <name>18F26K42_C</name>
+            <creation-uuid>b93ff3c2-2f91-432c-ac16-01ba7e56e5e9</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
             <header-extensions/>
             <asminc-extensions/>

@@ -3,12 +3,12 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>PIC16F506_C_Test</name>
-            <creation-uuid>04b450de-312a-462a-b170-78497558e25c</creation-uuid>
+            <name>33FJ128MC802_AudioFilter</name>
+            <creation-uuid>c99c4077-1bc9-4ae4-8ec4-feadc268a7a0</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>
-            <header-extensions>h</header-extensions>
+            <header-extensions/>
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>

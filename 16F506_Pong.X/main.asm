@@ -9,19 +9,26 @@
 ; CONFIG
 ; __config 0xFB4
  __CONFIG _OSC_IntRC_RB4EN & _WDT_OFF & _CP_OFF & _MCLRE_ON & _IOSCFS_OFF
-BANK0        UDATA
 
-GPR_VAR1    UDATA
+INT_VAR	UDATA_SHR
     subroutine_input		RES 1
     subroutine_input2		RES 1
     subroutine_output		RES 1
+GPR_VAR1    UDATA
     scratch1			RES 1
     scratch2			RES 1
     counter			RES 1
     counter2			RES 1
     counter3			RES 1
-    num_to_output		RES 1
     char_index			RES 1
+    left_score			RES 1
+    right_score			RES 1
+    left_position		RES 1
+    right_position		RES 1
+    ball_x			RES 1
+    ball_x_old			RES 1
+    ball_y			RES 1
+    ball_y_old			RES 1
 GPR_VAR2    UDATA
     stack			RES 0x10
 
@@ -223,6 +230,10 @@ SHIFTOUT_M
     GOTO SHIFTOUT_M_IMPL
 MUL_SW
     GOTO MUL_SW_IMPL
+PUT_CHAR
+    GOTO PUT_CHAR_IMPL
+DRAW_PADDLES
+    GOTO DRAW_PADDLES_IMPL
     
 PAUSE_IMPL
     MOVWF counter
@@ -307,10 +318,87 @@ MUL_SW_IMPL
     ADDWF subroutine_input, W
     MOVWF subroutine_output
     RETLW 0x00
+
+;subroutine_input: x coord, in pixels
+;subroutine_input2: y coord, in lines (8 pix/line)
+PUT_CHAR_IMPL
+    CLRF counter
+PUT_CHAR_LOOP
+    BCF PORTC, LCD_DC
+    BCF PORTC, NSS
+    MOVLW b'10000000'
+    ADDWF counter, W
+    ADDWF subroutine_input, F
+    CALL SHIFTOUT_M
+    MOVFW subroutine_input2
+    IORLW b'01000000'
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
+    
+    BSF PORTC, LCD_DC
+    MOVFW char_index
+    ANDLW 0x0f
+    MOVWF subroutine_input
+    MOVFW counter
+    MOVWF subroutine_input2
+    CALL CHARTABLE_NUMS
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
+    INCF counter, F
+    MOVLW 0x06
+    SUBWF counter, W
+    BTFSS STATUS, Z
+    GOTO PUT_CHAR_LOOP
+    BSF PORTC, NSS
+    RETLW 0x00
+    
+DRAW_PADDLES_IMPL
+    BCF PORTC, LCD_DC
+    BCF PORTC, NSS
+    
+    ;clear left and right columns
+    ;find y byte of paddle
+    ;and with 0xf8, then rlf three times
+    ;if ypos & 0x07 then we need to draw 2 bytes
+    
+    
+    IORLW b'01000000'
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
+    MOVFW counter2
+    MOVWF subroutine_input
+    MOVLW 0x06
+    MOVWF subroutine_input2
+    CALL MUL_SW
+    MOVLW b'10000000'
+    ADDWF subroutine_output, W
+    ADDWF counter, W
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
+    
+    BSF PORTC, LCD_DC
+    MOVFW char_index
+    ANDLW 0x0f
+    MOVWF subroutine_input
+    MOVFW counter
+    MOVWF subroutine_input2
+    CALL CHARTABLE_NUMS
+    MOVWF subroutine_input
+    CALL SHIFTOUT_M
+    INCF counter, F
+    MOVLW 0x06
+    SUBWF counter, W
+    BTFSS STATUS, Z
+    ;GOTO PRINT_2_LOOP
+    BSF PORTC, NSS
+    retlw 0x00
     
 START
     MOVWF OSCCAL
     BANKSEL subroutine_input
+    
+    MOVLW stack
+    MOVWF FSR
     
     MOVLW 0xff
     TRIS PORTB
@@ -340,6 +428,10 @@ START
     ShiftOut 0x80	; set X addr = 0
     BSF PORTC, NSS
     
+    ;init ADC
+    MOVLW b'01111001' ;enable ADC, AN2 enabled, INTOSC/4, AN2 input
+    MOVWF ADCON0
+    
     MOVLW 0x83
     MOVWF counter
     MOVLW 0x5
@@ -356,72 +448,35 @@ CLEARSCREEN_LOOP_X
     BTFSS STATUS, Z
     GOTO CLEARSCREEN_LOOP_Y
     
-    CLRF char_index
-    CLRF counter3
-Y_INCR_LOOP
-    CLRF counter2
-LOOP
-    CLRF counter
-PRINT_2_LOOP
-    BCF PORTC, LCD_DC
-    BCF PORTC, NSS
-    MOVFW counter3
-    IORLW b'01000000'
-    MOVWF subroutine_input
-    CALL SHIFTOUT_M
-    MOVFW counter2
-    MOVWF subroutine_input
-    MOVLW 0x06
-    MOVWF subroutine_input2
-    CALL MUL_SW
-    MOVLW b'10000000'
-    ADDWF subroutine_output, W
-    ADDWF counter, W
-    MOVWF subroutine_input
-    CALL SHIFTOUT_M
-    
-    BSF PORTC, LCD_DC
-    MOVFW char_index
-    ANDLW 0x0f
-    MOVWF subroutine_input
-    MOVFW counter
-    MOVWF subroutine_input2
-    CALL CHARTABLE_NUMS
-    MOVWF subroutine_input
-    CALL SHIFTOUT_M
-    INCF counter, F
-    MOVLW 0x06
-    SUBWF counter, W
-    BTFSS STATUS, Z
-    GOTO PRINT_2_LOOP
-    BSF PORTC, NSS
-    
-;    MOVFW counter
-;    MOVWF scratch1
-;    MOVFW counter2
-;    MOVWF scratch2
-;    
-;    MOVLW 0x3f
-;    CALL PAUSE
-;    
-;    MOVFW scratch1
-;    MOVWF counter
-;    MOVFW scratch2
-;    MOVWF counter2
-    
-    INCF char_index, F
-    INCF counter2, F
-    MOVLW 0x0e
-    SUBWF counter2, W
-    BTFSS STATUS, Z
-    GOTO LOOP
-    
-    INCF counter3, F
-    MOVLW 0x06
-    SUBWF counter3, W
+MAINLOOP
+    BSF ADCON0, GO_NOT_DONE
+WAIT_FOR_ADC
+    BTFSC ADCON0, GO_NOT_DONE
+    GOTO WAIT_FOR_ADC
+    MOVFW ADRES
+    BCF STATUS, C
+    ANDLW 0xf0
+    MOVWF scratch1
+    RRF scratch1, F
+    RRF scratch1, F
+    RRF scratch1, F
+    RRF scratch1, W
+    MOVWF char_index
     MOVLW 0x00
-    BTFSC STATUS, Z
-    MOVWF counter3
-    GOTO Y_INCR_LOOP
+    MOVWF subroutine_input
+    MOVLW 0x00
+    MOVWF subroutine_input2
+    CALL PUT_CHAR
+    
+    MOVFW ADRES
+    ANDLW 0x0f
+    MOVWF char_index
+    MOVLW 0x06
+    MOVWF subroutine_input
+    MOVLW 0x00
+    MOVWF subroutine_input2
+    CALL PUT_CHAR
+    
+    GOTO MAINLOOP
     
     END
