@@ -23,7 +23,7 @@ static const uint8_t init[] = {0x23, 0x13, 0xC7, 0x22, 0x0C, 0x40, 0x80};
 #define BALL_SPEED 4
 
 uint8_t ball_vx = 1;
-int8_t ball_vy = 0;
+int8_t ball_vy = 1;
 int8_t ball_x = 1;
 uint8_t ball_y = 1;
 uint8_t left_paddle = 0;
@@ -39,7 +39,7 @@ void main(void) {
     OPTION = 0x97;
     CM1CON0 = 0xf7;
     CM2CON0 = 0xf7;
-    ADCON0 = 0x71;
+    ADCON0 = 0xf1;
     
     LCD_PORT.LCD_RST = 0;
     __delay_ms(1);
@@ -56,10 +56,10 @@ void main(void) {
     }
     
     while (1) {
+        left_paddle = readADC(1);
         right_paddle = readADC(2);
-        left_paddle = readADC(2);
         //left_paddle = 40 - convertReadingToPaddle(reading);
-        left_paddle = 40 - convertReadingToPaddle(left_paddle);
+        left_paddle = convertReadingToPaddle(left_paddle);
         right_paddle = convertReadingToPaddle(right_paddle);
         
         clearPaddles();
@@ -102,10 +102,8 @@ void main(void) {
             ball_vy = -ball_vy;
         }
         
-        if (left_score > 9) {
+        if (left_score > 9 || right_score > 9) {
             left_score = 0;
-        }
-        if (right_score > 9) {
             right_score = 0;
         }
         

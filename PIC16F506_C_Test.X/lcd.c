@@ -60,18 +60,18 @@ void drawReading(uint8_t reading, uint8_t x, uint8_t y)
     uint8_t remain = reading;
     reading = reading / 10;
     remain = remain - (reading << 3) - reading - reading;
-    for (int i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i) {
         setXY_sm(x + 12 + i, y);
         shiftbyte_noNSS(nums[mul10(remain) + i]);
     }
     remain = reading;
     reading = reading / 10;
     remain = remain - (reading << 3) - reading - reading;
-    for (int i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i) {
         setXY_sm(x + 6 + i, y);
         shiftbyte_noNSS(nums[mul10(remain) + i]);
     }
-    for (int i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i) {
         setXY_sm(x + i, y);
         shiftbyte_noNSS(nums[mul10(reading) + i]);
     }
@@ -117,10 +117,10 @@ void drawNum(uint8_t num, uint8_t x, uint8_t y)
 {
     SPI_PORT.NSS = 0;
     uint8_t temp = 0;
-    for (int i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i) {
         temp += num;
     }
-    for (int i = 0; i < 6; ++i) {
+    for (uint8_t i = 0; i < 6; ++i) {
         setXY_sm(x + i, y);
         shiftbyte_noNSS(nums[temp + i]);
     }
